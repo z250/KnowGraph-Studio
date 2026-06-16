@@ -1,0 +1,46 @@
+{
+  "name": "myuxi-backend",
+  "version": "0.1.0",
+  "description": "MyYuxi - 智能知识库与知识图谱智能体开发平台（后端）",
+  "private": true,
+  "scripts": {
+    "build": "nest build",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:debug": "nest start --debug --watch",
+    "start:worker": "tsx src/workers/agent-run.worker.ts",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:seed": "tsx prisma/seed.ts",
+    "prisma:reset": "prisma migrate reset --force",
+    "prisma:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@langchain/core": "^0.3.0",
+    "@langchain/langgraph": "^0.2.0",
+    "@langchain/openai": "^0.3.0",
+    "@nestjs/common": "^10.4.0",
+    "@nestjs/config": "^3.3.0",
+    "@nestjs/core": "^10.4.0",
+    "@nestjs/platform-express": "^10.4.0",
+    "@prisma/client": "^5.22.0",
+    "bullmq": "^5.21.0",
+    "ioredis": "^5.4.0",
+    "js-tiktoken": "^1.0.0",
+    "langchain": "^0.3.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.0",
+    "uuid": "^10.0.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^10.4.0",
+    "@nestjs/schematics": "^10.2.0",
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.0.0",
+    "@types/uuid": "^10.0.0",
+    "prisma": "^5.22.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}

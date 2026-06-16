@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  username      String    @unique @db.VarChar(100)
+  passwordHash  String    @map("password_hash") @db.VarChar(255)
+  role          String    @default("user") @db.VarChar(20)
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  conversations Conversation[]
+  agentRuns     AgentRun[]
+
+  @@map("users")
+}
+
+model AgentConfig {
+  id        Int       @id @default(autoincrement())
+  agentId   String    @map("agent_id") @db.VarChar(100)
+  name      String    @db.VarChar(200)
+  configJson Json     @map("config_json")
+  isDefault Boolean   @default(false) @map("is_default")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  conversations Conversation[]
+  agentRuns     AgentRun[]
+
+  @@map("agent_configs")
+}
+
+model Conversation {
+  id           Int       @id @default(autoincrement())
+  threadId     String    @unique @map("thread_id") @db.VarChar(36)
+  userId       Int       @map("user_id")
+  agentConfigId Int?     @map("agent_config_id")
+  title        String?   @db.VarChar(500)
+  status       String    @default("active") @db.VarChar(20)
+  isPinned     Boolean   @default(false) @map("is_pinned")
+  extraMetadata Json     @default("{}") @map("extra_metadata")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  user        User        @relation(fields: [userId], references: [id])
+  agentConfig AgentConfig? @relation(fields: [agentConfigId], references: [id])
+  messages    Message[]
+
+  @@index([userId])
+  @@index([agentConfigId])
+  @@map("conversations")
+}
+
+model Message {
+  id             Int       @id @default(autoincrement())
+  conversationId Int       @map("conversation_id")
+  role           String    @db.VarChar(20)
+  content        String    @db.Text
+  messageType    String    @default("text") @map("message_type") @db.VarChar(30)
+  extraMetadata  Json      @default("{}") @map("extra_metadata")
+  imageContent   String?   @map("image_content") @db.Text
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  conversation Conversation @relation(fields: [conversationId], references: [id])
+
+  @@index([conversationId])
+  @@map("messages")
+}
+
+model AgentRun {
+  id           String   @id @db.VarChar(36)
+  threadId     String   @map("thread_id") @db.VarChar(36)
+  agentConfigId Int?    @map("agent_config_id")
+  userId       Int      @map("user_id")
+  status       String   @default("pending") @db.VarChar(20)
+  requestId    String?  @map("request_id") @db.VarChar(100)
+  inputPayload Json     @default("{}") @map("input_payload")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user        User         @relation(fields: [userId], references: [id])
+  agentConfig AgentConfig? @relation(fields: [agentConfigId], references: [id])
+
+  @@index([threadId])
+  @@index([userId])
+  @@map("agent_runs")
+}
